@@ -1,0 +1,13 @@
+<h1>National Language Support (NLS)</h1>
+<div>
+    <label>Language</label>
+    <select [(ngModel)]="locale" (change)="nls.setLocale($event.target.value);">
+        <option *ngFor="let l of nls.getSupportedLocales()" [value]="l">{{l | nls}}</option>
+    </select>
+    <div>
+        <button>{{'Yes' | nls}}</button>
+        <button>{{'No' | nls}}</button>
+        <button>{{'Ok' | nls}}</button>
+        <button>{{'Cancel' | nls}}</button>
+    </div>
+</div>

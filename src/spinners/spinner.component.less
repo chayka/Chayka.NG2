@@ -1,0 +1,17 @@
+@img-width: 24px;
+@img-height: 24px;
+@size-padding: 10px;
+
+.chayka-spinner {
+    padding: 0 0 0 (@img-width + @size-padding);
+    background: url('./spinner32x32.gif') no-repeat 0 0;
+    background-size: @img-width @img-height;
+    min-height: @img-height;
+    line-height: @img-height;
+    vertical-align: middle;
+    display: inline-block;
+
+    & > .spinner-message{
+
+    }
+}

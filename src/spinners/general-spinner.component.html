@@ -1,0 +1,5 @@
+<div class="chayka-general_spinner" *ngIf="spinners.length">
+    <div class="general_spinner-spinners">
+        <spinner *ngFor="let spinner of spinners" [message]="spinner.message" [visible]="true"></spinner>
+    </div>
+</div>

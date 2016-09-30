@@ -1,0 +1,6 @@
+<div class="chayka-spinner"
+     [style.visibility]="mode === 'visibility' && !visible ? 'hidden' : ''"
+     [style.display]="mode === 'display' && !visible ? 'none' : ''">
+    <span class="spinner-message" *ngIf="!message"><ng-content></ng-content></span>
+    <span class="spinner-message" *ngIf="!!message">{{message}}</span>
+</div>
