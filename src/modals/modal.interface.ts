@@ -25,6 +25,12 @@ export interface ModalButtonInterface {
      * (e.g. 'danger' -> 'button-danger')
      */
     cls?: string[],
+
+    /**
+     * Value that will be passed to 'close' callback,
+     * If omitted, 'text' property will be passed.
+     */
+    value?: any
 }
 
 /**
@@ -50,7 +56,7 @@ export interface ModalInterface {
     /**
      * Modal popup classes
      */
-    cls: string[],
+    cls?: string[],
 
     /**
      * CSS value of width property

@@ -1,0 +1,16 @@
+<!--<modal *ngIf="modals.queue.length"-->
+       <!--[title]="getModal().title"-->
+       <!--[buttons]="getModal().buttons"-->
+       <!--[cls]="getModal().cls"-->
+       <!--[width]="getModal().width"-->
+       <!--[height]="getModal().height"-->
+       <!--[visible]="true" (close)="close()">{{getModal().content}}</modal>-->
+<modal *ngFor="let modal of modals.queue, let i = index;"
+       [title]="modal.title"
+       [buttons]="modal.buttons"
+       [cls]="modal.cls"
+       [width]="modal.width"
+       [height]="modal.height"
+       [visible]="!i" (close)="close()">
+    {{getModal().content}}
+</modal>

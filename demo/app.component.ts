@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { SpinnersService } from '../src/spinners/spinners.service';
+import { ModalsService } from '../src/modals/modals.service';
 
 @Component({
     selector: 'chayka-app',
@@ -7,10 +8,9 @@ import { SpinnersService } from '../src/spinners/spinners.service';
 })
 export class AppComponent {
 
-    spinners: SpinnersService;
-
     constructor(
-        spinners: SpinnersService
+        public spinners: SpinnersService,
+        public modals: ModalsService
     ){
         // let loading = this.spinners.show('Loading app...');
         // setTimeout(()=>{

@@ -1,0 +1,32 @@
+<h1>Modals</h1>
+<div>
+
+    <modal #modal1 [title]="'Cool modal box'" [visible]="false">
+        <div>User Content
+        separated into several lines!</div>
+        <button (click)="modal1.hide()">Ok</button>
+    </modal>
+
+
+    <button (click)="modal1.show()">Show cool modal box</button>
+
+    <modal #modal2 [title]="'Cool box with buttons'" [buttons]="[{text:'Ok', value: 1}, {text: 'Cancel', value: 0}]"
+           (close)="modalClosed($event)">
+        <div>User Content</div>
+    </modal>
+
+    <button (click)="modal2.show()">Show cool modal box with buttons</button>
+
+    <button (click)="showAlert()">Show alert</button>
+    <button (click)="show2Alerts()">Show 2 alerts</button>
+    <button (click)="showConfirm()">Show confirm</button>
+
+
+    <!--<modal #modal3 [title]="'Url box'" [url]="'/agreement.html'" [buttons]="[{title:'Ok'}]"-->
+           <!--(close)="modalClosed($event)">-->
+        <!--<div>User Content</div>-->
+    <!--</modal>-->
+
+    <!--<button (click)="modal3.show()">Show cool modal box with content fetched from url</button>-->
+
+</div>

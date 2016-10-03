@@ -1,10 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-
-</body>
-</html>
+<div class="chayka-modals-fader" *ngIf="visible" (click)="hide('close')">
+    <div [class]="['chayka-modals-modal'].concat(cls||[]).join(' ')" [style.width]="width" [style.height]="height">
+        <div class="modal_header">
+            <div class="modal_header-title">{{title | nls}}</div>
+            <div class="modal_header-close" (click)="hide('close')">&times;</div>
+        </div>
+        <div class="modal_body"><ng-content></ng-content></div>
+        <div class="modal_buttons" *ngIf="buttons && buttons.length">
+            <button *ngFor="let button of buttons"
+                    (click)="button.persist || hide(button.value!==undefined? button.value : button.text); button.click && button.click();"
+                    [class]="button.cls?.join(' ') || ''">{{button.text | nls}}</button>
+        </div>
+    </div>
+</div>
