@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var helpers = require('./helpers');
 
@@ -77,6 +78,11 @@ module.exports = {
             comments: false //prod
 
         }),
+
+        new CopyWebpackPlugin([{
+            from: helpers.root('demo/api'),
+            to: 'api'
+        }]),
 
         new HtmlWebpackPlugin({
             template: 'demo/index.html'
