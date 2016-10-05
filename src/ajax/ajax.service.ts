@@ -123,12 +123,12 @@ export class AjaxService {
      */
     request<T>(url: string, options: AjaxRequestArgs = {}): Observable<T>{
 
-        options = <AjaxRequestArgs> Object.assign(options, {
+        options = <AjaxRequestArgs> Object.assign({
             spinnerMessage: this.nls._('Processing...'),
             errorMessage: this.nls._('Operation failed'),
             successMessage: false,
             validate: true,
-        });
+        }, options);
 
         if(!options.validate || !options.validator || options.validator.valid){
             /**
@@ -152,11 +152,12 @@ export class AjaxService {
                 }
             };
 
-            let onError = (error) => {
+            let onError = (error: any) => {
                 if(options.errorMessage){
                     this.modals.alert(<string> options.errorMessage);
                 }
-                console.dir({error});
+                // console.dir({error});
+                onComplete();
                 return error;
             };
 
@@ -164,72 +165,168 @@ export class AjaxService {
                 let json: any = null;
                 try{
                     json = res.json();
-                }catch(e: Error){
+                }catch(e){
                     let text = res.text();
-                    let rawJson = text.match(/\{.*}\s*$/);
+                    // let rawJson = text.match(/{.*}/m);
+                    let rawJson = /{[^]*}/m.exec(text);
+                    // console.dir({text, rawJson});
                     try{
                         json = rawJson && JSON.parse(rawJson[0]);
-                    }catch(e: Error){
+                    }catch(e){
                         json = null;
                     }
                 }
+                if(options.successMessage){
+                    this.modals.alert(<string> options.successMessage);
+                }
+                // console.dir({res, json});
 
                 return json && json[this._responsePayloadField] || null;
             };
 
-            let source = this.http.request(url, options)
+            let source = <Observable<T>> this.http.request(url, options)
                 .do(onComplete)
                 .map(parseResponse)
                 .catch(onError);
             return source;
         }
 
-        return Observable.throw(this.nls._('Provided data is non valid'));
+        return <Observable<T>> Observable.throw(this.nls._('Provided data is non valid'));
     }
 
-    get<T>(url: string, options?: RequestOptionsArgs = {}) : Observable<T> {
+    /**
+     * Perform GET request
+     *
+     * @param {string} url
+     * @param {AjaxRequestArgs} options
+     * @return {Observable<T>}
+     */
+    get<T>(url: string, options: AjaxRequestArgs = {}) : Observable<T> {
         options.method = RequestMethod.Get;
-        return this.request(url, options);
+        return <Observable<T>> this.request(url, options);
     }
 
-    post<T>(url: string, body: any, options?: RequestOptionsArgs) : Observable<T> {
+    /**
+     * Perform POST request
+     *
+     * @param {string} url
+     * @param {any} body
+     * @param {AjaxRequestArgs} options
+     * @return {Observable<T>}
+     */
+    post<T>(url: string, body: any, options: AjaxRequestArgs = {}) : Observable<T> {
         options.method = RequestMethod.Post;
         options.body = body;
-        return this.request(url, options);
+        return <Observable<T>> this.request(url, options);
     }
 
-    put<T>(url: string, body: any, options?: RequestOptionsArgs) : Observable<T> {
+    /**
+     * Perform PUT request
+     * @param {string} url
+     * @param {any} body
+     * @param {AjaxRequestArgs} options
+     * @return {Observable<T>}
+     */
+    put<T>(url: string, body: any, options: AjaxRequestArgs = {}) : Observable<T> {
         options.method = RequestMethod.Put;
         options.body = body;
-        return this.request(url, options);
+        return <Observable<T>> this.request(url, options);
     }
 
-    del<T>(url: string, options?: RequestOptionsArgs) : Observable<Response>{
+    /**
+     * Perform DELETE request
+     * @param {string} url
+     * @param {AjaxRequestArgs} options
+     * @return {Observable<T>}
+     */
+    del<T>(url: string, options: AjaxRequestArgs = {}) : Observable<T>{
         options.method = RequestMethod.Delete;
-        return this.request(url, options);
+        return <Observable<T>> this.request(url, options);
     }
 
-    patch<T>(url: string, body: any, options?: RequestOptionsArgs) : Observable<T>{
+    /**
+     * Perform PATCH request
+     * @param {string} url
+     * @param {any} body
+     * @param {AjaxRequestArgs} options
+     * @return {Observable<T>}
+     */
+    patch<T>(url: string, body: any, options: AjaxRequestArgs = {}) : Observable<T>{
         options.method = RequestMethod.Patch;
         options.body = body;
-        return this.request(url, options);
+        return <Observable<T>> this.request(url, options);
     }
 
-    head<T>(url: string, options?: RequestOptionsArgs) : Observable<T>{
+    /**
+     * Perform HEAD request
+     * @param {string} url
+     * @param {AjaxRequestArgs} options
+     * @return {Observable<T>}
+     */
+    head<T>(url: string, options: AjaxRequestArgs = {}) : Observable<T>{
         options.method = RequestMethod.Head;
-        return this.request(url, options);
+        return <Observable<T>> this.request(url, options);
     }
 
-    options<T>(url: string, options?: RequestOptionsArgs) : Observable<T>{
+    /**
+     * Perform OPTIONS request
+     * @param {string} url
+     * @param {AjaxRequestArgs} options
+     * @return {Observable<T>}
+     */
+    options<T>(url: string, options: AjaxRequestArgs = {}) : Observable<T>{
         options.method = RequestMethod.Options;
-        return this.request(url, options);
+        return <Observable<T>> this.request(url, options);
     }
 
-    buildGetQuery(data: any): string {
-        return data.toString();
+    /**
+     * Generate http query
+     *
+     * @param {any} data
+     * @return {string}
+     */
+    buildQuery(data: any): string {
+        let buildQuery = (obj: any, httpParam: string = ''):string => {
+            switch(typeof obj){
+                case 'object':
+                    if(obj instanceof Date){
+                        return encodeURIComponent(httpParam) + '=' + JSON.stringify(obj);
+                    }else if(obj === null){
+                        return encodeURIComponent(httpParam) + '=';
+                    }else if(Array.isArray(obj)){
+                        let arr: string[] = [];
+                        obj.forEach( val => {
+                            arr.push(buildQuery(val, (httpParam || 'arr')+'[]'));
+                        });
+                        return arr.join('&');
+                    }else{
+                        let arr: string[] = [];
+                        Object.keys(obj).forEach( key => {
+                            arr.push(buildQuery(obj[key], httpParam ? `${httpParam}[${key}]` : key ));
+                        });
+                        return arr.join('&');
+                    }
+                case 'undefined':
+                    return encodeURIComponent(httpParam) + '=';
+                case 'boolean':
+                    return encodeURIComponent(httpParam) + '=' + ( obj ? 'true' : 'false');
+                case 'string':
+                case 'number':
+                default:
+                    return encodeURIComponent(httpParam) + '=' + encodeURIComponent(obj);
+            }
+        };
+
+        return buildQuery(data);
     }
 
+    /**
+     * Generate url with get params
+     * @param {string} url
+     * @param {any} data
+     * @return {string}
+     */
     buildGetQueryUrl(url: string, data: any): string {
-        return `${url}?${this.buildGetQuery(data)}`;
+        return `${url}?${this.buildQuery(data)}`;
     }
 }

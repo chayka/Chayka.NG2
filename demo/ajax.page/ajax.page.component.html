@@ -1,0 +1,19 @@
+<h1>Ajax</h1>
+<div>
+    <button (click)="makeSimpleRequest()">Make Request</button>
+    <button (click)="makeGetRequest()">Make Get Request</button>
+</div>
+<div>
+    <h2>Items</h2>
+    <div *ngFor="let item of items"> {{item}} </div>
+    <button (click)="requestItems()">Request items</button>
+    <button (click)="requestBrokenItems()">Request broken items</button>
+    <button (click)="requestPostItems()">Json Post request (fail)</button>
+    <button (click)="requestPlainPostItems()">Plain Post request (fail)</button>
+</div>
+
+<div>
+    <h2>Spinner</h2>
+    <spinner #spinner></spinner>
+    <button (click)="requestWithCustomSpinner(spinner);">Custom spinner</button>
+</div>
