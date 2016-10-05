@@ -6,12 +6,14 @@ import { HomePageComponent } from "./home.page/home.page.component";
 import { NotFoundPageComponent } from "./not-found.page/not-found.page.component";
 import { ModalsPageComponent } from './modals.page/modals.page.component';
 import { AjaxPageComponent } from './ajax.page/ajax.page.component';
+import { ValidationPageComponent } from './validation.page/validation.page.component';
 
 const appRoutes: Routes = [
     { path: 'nls', component: NlsPageComponent },
     { path: 'spinners', component: SpinnersPageComponent },
     { path: 'modals', component: ModalsPageComponent },
     { path: 'ajax', component: AjaxPageComponent },
+    { path: 'validation', component: ValidationPageComponent },
     { path: '', component: HomePageComponent },
     { path: '**', component: NotFoundPageComponent }
 ];

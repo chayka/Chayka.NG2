@@ -1,0 +1,10 @@
+<h1>Form validation</h1>
+<div>
+    <!--<form-validator>-->
+        <form-field [hint]="'Digits only...'" #field1>
+            <label>Some input</label>
+            <input type="text" validate-required title="some input" [(ngModel)]="userPass"/>
+        </form-field>
+    <!--</form-validator>-->
+    <button (click)="field1.validate();">Validate</button>
+</div>

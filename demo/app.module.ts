@@ -5,6 +5,8 @@ import { SpinnersModule } from '../src/spinners/spinners.module'
 import { NlsModule } from '../src/nls/nls.module';
 import { ModalsModule } from '../src/modals/modals.module';
 import { AjaxModule } from '../src/ajax/ajax.module';
+import { ValidationModule } from '../src/validation/validation.module';
+
 import { AppComponent } from './app.component';
 import { routing, appRoutingProviders } from "./app.routing";
 import { HomePageComponent } from './home.page/home.page.component';
@@ -13,6 +15,8 @@ import { SpinnersPageComponent } from './spinners.page/spinners.page.component';
 import { NlsPageComponent } from './nls.page/nls.page.component';
 import { ModalsPageComponent } from './modals.page/modals.page.component';
 import { AjaxPageComponent } from './ajax.page/ajax.page.component';
+import { ValidationPageComponent } from './validation.page/validation.page.component';
+
 @NgModule({
     imports: [
         BrowserModule,
@@ -21,6 +25,7 @@ import { AjaxPageComponent } from './ajax.page/ajax.page.component';
         SpinnersModule,
         ModalsModule,
         AjaxModule,
+        ValidationModule,
 
         routing
     ],
@@ -31,7 +36,8 @@ import { AjaxPageComponent } from './ajax.page/ajax.page.component';
         NlsPageComponent,
         SpinnersPageComponent,
         ModalsPageComponent,
-        AjaxPageComponent
+        AjaxPageComponent,
+        ValidationPageComponent
     ],
     providers: [
         appRoutingProviders

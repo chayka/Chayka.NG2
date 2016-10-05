@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import { Component } from '@angular/core';
 import { AjaxService } from '../../src/ajax/ajax.service';
 import { SpinnerComponent } from '../../src/spinners/spinner.component';
 
