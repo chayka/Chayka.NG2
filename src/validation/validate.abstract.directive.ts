@@ -28,6 +28,14 @@ export interface ValidateConfigInterface {
 export abstract class ValidateAbstractDirective {
 
     /**
+     * If user config specified in the form of string, number, then this field is considered.
+     * If boolean is provided, then 'isActive' is considered.
+     *
+     * @type {string}
+     */
+    defaultConfigField: string = 'message';
+
+    /**
      * User config
      *
      * @type {{}}
@@ -47,12 +55,30 @@ export abstract class ValidateAbstractDirective {
     };
 
     /**
-     * Config getter
+     * Config getter. Developer may passes his config in several forms:
+     *
+     * <form-field validate-required > - no custom config
+     * <form-field [validate-required]="{message: 'Please fill in your name', isActive: needValidation}" > - config as object
+     * <form-field [validate-required]="'Please fill in your name'" > - By default 'message' is configured
+     * <form-field validate-required="Please fill in your name" > - no sense in watching constant sting
+     * <form-field [validate-required]="needValidation" > - if boolean is passed, then 'isActive' is configured
      *
      * @return {{}}
      */
     get config(): any {
-        return Object.assign({}, this.defaultConfig, this.userConfig);
+        let userConfig = {};
+        if(this.userConfig){
+            if(['string', 'number', 'function', 'symbol'].indexOf(typeof this.userConfig) >= 0){
+                userConfig[this.defaultConfigField] = this.userConfig;
+            }else if(typeof this.userConfig === 'object' && (this.userConfig instanceof Date || Array.isArray(this.userConfig))){
+                userConfig[this.defaultConfigField] = this.userConfig;
+            }else if(typeof this.userConfig === 'boolean'){
+                userConfig['isActive'] = this.userConfig;
+            }else{
+                userConfig = this.userConfig;
+            }
+        }
+        return Object.assign({}, this.defaultConfig, userConfig);
     }
 
     /**
@@ -69,6 +95,11 @@ export abstract class ValidateAbstractDirective {
         return this.ngModel.value;
     }
 
+    /**
+     * In implementation classes, nls dictionaries should be set up here.
+     *
+     * @param nls
+     */
     constructor(protected nls: NlsService){
 
     }
@@ -87,6 +118,7 @@ export abstract class ValidateAbstractDirective {
      * Get validation message
      */
     getMessage(messageConfigId: string = 'message'): string {
-        return this.nls._(this.config[messageConfigId] || '', this.config);
+        let config = this.config;
+        return this.nls._(config[messageConfigId] || '', config);
     }
 }

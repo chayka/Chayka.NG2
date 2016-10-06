@@ -5,6 +5,15 @@ import {
 import { NgModel } from '@angular/forms';
 import { ValidateRequiredDirective } from './validate.required.directive';
 import { ValidateAbstractDirective } from './validate.abstract.directive';
+import { ValidateLengthDirective } from './validate.length.directive';
+import {
+    ValidateRangeDirective,
+    ValidateGeDirective,
+    ValidateGtDirective,
+    ValidateLeDirective,
+    ValidateLtDirective,
+} from './validate.range.directive';
+import { ValidateRegExpDirective, ValidateEmailDirective } from './validate.regexp.directive';
 
 /**
  * Provides form validation in the following format
@@ -66,16 +75,68 @@ export class FormFieldComponent implements OnInit {
     }
 
     /**
-     * ngOnInit should put all validations except 'required' here
+     * ngOnInit should put all validations except 'vRequired' here
      * @type {Array}
      */
     protected validations: ValidateAbstractDirective[] = [];
 
-    @ContentChild(ValidateRequiredDirective) required : ValidateRequiredDirective;
+    /**
+     * Fetch validate-required
+     */
+    @ContentChild(ValidateRequiredDirective) vRequired : ValidateRequiredDirective;
 
+    /**
+     * Fetch validate-length
+     */
+    @ContentChild(ValidateLengthDirective) vLength : ValidateLengthDirective;
+
+    /**
+     * Fetch validate-range
+     */
+    @ContentChild(ValidateRangeDirective) vRange : ValidateRangeDirective;
+
+    /**
+     * Fetch validate-ge
+     */
+    @ContentChild(ValidateGeDirective) vGe : ValidateGeDirective;
+
+    /**
+     * Fetch validate-gt
+     */
+    @ContentChild(ValidateGtDirective) vGt : ValidateGtDirective;
+
+    /**
+     * Fetch validate-le
+     */
+    @ContentChild(ValidateLeDirective) vLe : ValidateLeDirective;
+
+    /**
+     * Fetch validate-lt
+     */
+    @ContentChild(ValidateLtDirective) vLt : ValidateLtDirective;
+
+    /**
+     * Fetch validate-regexp
+     */
+    @ContentChild(ValidateRegExpDirective) vRegExp : ValidateRegExpDirective;
+
+    /**
+     * Fetch validate-email
+     */
+    @ContentChild(ValidateEmailDirective) vEmail : ValidateEmailDirective;
+
+    /**
+     * Constructor
+     *
+     * @param el
+     * @param $
+     */
     constructor(private el: ElementRef, private $: Renderer){
     }
 
+    /**
+     * Setup validations and value watching.
+     */
     ngOnInit(): void {
         // this.validations.push()
         console.dir(this);
@@ -83,16 +144,51 @@ export class FormFieldComponent implements OnInit {
             this.ngModel.update.subscribe((value: any) => {
                 console.dir({value});
                 setTimeout(() => this.validate(), 0);
-                // this.validate();
             })
+        }
+        if(this.vLength){
+            this.validations.push(this.vLength);
+        }
+        if(this.vRange){
+            this.validations.push(this.vRange);
+        }
+        if(this.vGe){
+            this.validations.push(this.vGe);
+        }
+        if(this.vGt){
+            this.validations.push(this.vGt);
+        }
+        if(this.vLe){
+            this.validations.push(this.vLe);
+        }
+        if(this.vLt){
+            this.validations.push(this.vLt);
+        }
+        if(this.vRegExp){
+            this.validations.push(this.vRegExp);
+        }
+        if(this.vEmail){
+            this.validations.push(this.vEmail);
         }
     }
 
+    /**
+     * Set form field state based on validation
+     *
+     * @param state
+     * @param message
+     */
     setState(state: string, message: string = ''){
         this.state = state || 'clean';
         this.message = message;
     }
 
+    /**
+     * Perform single validation and set appropriate field state
+     *
+     * @param validation
+     * @return {boolean|null}
+     */
     performValidation(validation: ValidateAbstractDirective): boolean | null{
         let valid = validation.validate();
         switch(valid){
@@ -112,9 +208,14 @@ export class FormFieldComponent implements OnInit {
         return valid;
     }
 
+    /**
+     * Perform all validations
+     *
+     * @return {boolean|boolean|null}
+     */
     validate(): boolean | null {
         let v = this.validations;
-        let valid = !this.required || this.performValidation(this.required);
+        let valid = !this.vRequired || this.performValidation(this.vRequired);
         let value = this.value;
         if(value && valid){
             Object.keys(v).forEach(key => {

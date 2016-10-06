@@ -7,5 +7,6 @@ import { Component } from '@angular/core';
     styles: [ require('./validation.page.component.less') ]
 })
 export class ValidationPageComponent {
+    needValidation = true;
     userPass='';
 }

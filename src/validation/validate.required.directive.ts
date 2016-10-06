@@ -27,8 +27,26 @@ export interface ValidateRequiredConfigInterface extends ValidateConfigInterface
 })
 export class ValidateRequiredDirective extends ValidateAbstractDirective {
 
+    /**
+     * If user config specified in the form of string, number, then this field is considered.
+     * If boolean is provided, then 'isActive' is considered.
+     *
+     * @type {string}
+     */
+    defaultConfigField: string = 'message';
+
+    /**
+     * User config
+     *
+     * @type {ValidateRequiredConfigInterface}
+     */
     @Input('validate-required') userConfig: ValidateRequiredConfigInterface = {};
 
+    /**
+     * Default config values that are used if user config is not set up
+     *
+     * @type {ValidateRequiredConfigInterface}
+     */
     defaultConfig: ValidateRequiredConfigInterface = {
         message: 'validate-require-message',
         isActive: true,
@@ -39,6 +57,11 @@ export class ValidateRequiredDirective extends ValidateAbstractDirective {
      */
     @ContentChild(NgModel) ngModel: NgModel;
 
+    /**
+     * Setting up nls
+     *
+     * @param {NlsService} nls
+     */
     constructor(protected nls: NlsService){
         super(nls);
         this.nls.extendDictionary('en-US', {
@@ -49,6 +72,11 @@ export class ValidateRequiredDirective extends ValidateAbstractDirective {
         });
     }
 
+    /**
+     * Validate input
+     *
+     * @return {boolean}
+     */
     validate(): boolean {
         return !this.config.isActive || !!this.getValue();
     }

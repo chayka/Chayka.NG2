@@ -4,6 +4,13 @@ import { CommonModule } from '@angular/common';
 import { FormFieldComponent } from './form-field.component';
 // import { ValidateAbstractDirective } from './validate.abstract.directive';
 import { ValidateRequiredDirective } from './validate.required.directive';
+import { ValidateLengthDirective } from './validate.length.directive';
+import {
+    ValidateRangeDirective,
+    ValidateLeDirective, ValidateGeDirective,
+    ValidateGtDirective, ValidateLtDirective
+} from './validate.range.directive';
+import { ValidateRegExpDirective, ValidateEmailDirective } from './validate.regexp.directive';
 /**
  * Provides form validation in the following format
  *
@@ -20,13 +27,27 @@ import { ValidateRequiredDirective } from './validate.required.directive';
     imports: [ CommonModule, FormsModule ],
     declarations: [
         FormFieldComponent,
-        // ValidateAbstractDirective,
-        ValidateRequiredDirective
+        ValidateRequiredDirective,
+        ValidateLengthDirective,
+        ValidateRangeDirective,
+        ValidateGeDirective,
+        ValidateGtDirective,
+        ValidateLeDirective,
+        ValidateLtDirective,
+        ValidateRegExpDirective,
+        ValidateEmailDirective,
     ],
     exports: [
         FormFieldComponent,
-        // ValidateAbstractDirective,
-        ValidateRequiredDirective
+        ValidateRequiredDirective,
+        ValidateLengthDirective,
+        ValidateRangeDirective,
+        ValidateGeDirective,
+        ValidateGtDirective,
+        ValidateLeDirective,
+        ValidateLtDirective,
+        ValidateRegExpDirective,
+        ValidateEmailDirective,
     ],
     providers: []
 })

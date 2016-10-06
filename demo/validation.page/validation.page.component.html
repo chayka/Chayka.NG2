@@ -1,10 +1,14 @@
 <h1>Form validation</h1>
 <div>
     <!--<form-validator>-->
-        <form-field [hint]="'Digits only...'" #field1>
+        <form-field [hint]="'Digits only...'" #field1
+                    validate-required="This is fucking required field"
+                    [validate-length]="{min: 6, max: 16}">
             <label>Some input</label>
-            <input type="text" validate-required title="some input" [(ngModel)]="userPass"/>
+            <input type="text" title="some input" [(ngModel)]="userPass"/>
         </form-field>
     <!--</form-validator>-->
+    <button (click)="needValidation = !needValidation;">Toggle validation</button>
+    Validation {{needValidation?'On':'Off'}}
     <button (click)="field1.validate();">Validate</button>
 </div>
