@@ -13,7 +13,14 @@ import {
     ValidateLeDirective,
     ValidateLtDirective,
 } from './validate.range.directive';
-import { ValidateRegExpDirective, ValidateEmailDirective } from './validate.regexp.directive';
+import {
+    ValidateRegExpDirective,
+    ValidateEmailDirective
+} from './validate.regexp.directive';
+import {
+    ValidatePasswordComplexityDirective,
+    ValidatePasswordRepeatDirective
+} from './validate.password.dirctive';
 
 /**
  * Provides form validation in the following format
@@ -126,6 +133,16 @@ export class FormFieldComponent implements OnInit {
     @ContentChild(ValidateEmailDirective) vEmail : ValidateEmailDirective;
 
     /**
+     * Fetch validate-password-complexity
+     */
+    @ContentChild(ValidatePasswordComplexityDirective) vPasswordComplexity : ValidatePasswordComplexityDirective;
+
+    /**
+     * Fetch validate-password-repeat
+     */
+    @ContentChild(ValidatePasswordRepeatDirective) vPasswordRepeat : ValidatePasswordRepeatDirective;
+
+    /**
      * Constructor
      *
      * @param el
@@ -169,6 +186,12 @@ export class FormFieldComponent implements OnInit {
         }
         if(this.vEmail){
             this.validations.push(this.vEmail);
+        }
+        if(this.vPasswordComplexity){
+            this.validations.push(this.vPasswordComplexity);
+        }
+        if(this.vPasswordRepeat){
+            this.validations.push(this.vPasswordRepeat);
         }
     }
 

@@ -11,6 +11,7 @@ import {
     ValidateGtDirective, ValidateLtDirective
 } from './validate.range.directive';
 import { ValidateRegExpDirective, ValidateEmailDirective } from './validate.regexp.directive';
+import { ValidatePasswordComplexityDirective, ValidatePasswordRepeatDirective } from './validate.password.dirctive';
 /**
  * Provides form validation in the following format
  *
@@ -36,6 +37,8 @@ import { ValidateRegExpDirective, ValidateEmailDirective } from './validate.rege
         ValidateLtDirective,
         ValidateRegExpDirective,
         ValidateEmailDirective,
+        ValidatePasswordComplexityDirective,
+        ValidatePasswordRepeatDirective,
     ],
     exports: [
         FormFieldComponent,
@@ -48,6 +51,8 @@ import { ValidateRegExpDirective, ValidateEmailDirective } from './validate.rege
         ValidateLtDirective,
         ValidateRegExpDirective,
         ValidateEmailDirective,
+        ValidatePasswordComplexityDirective,
+        ValidatePasswordRepeatDirective,
     ],
     providers: []
 })
