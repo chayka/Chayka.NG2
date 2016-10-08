@@ -8,23 +8,29 @@ import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 /**
- * Prepares all the handlers to show all the spinners and errors
- *
- * @param options
- * - spinner: reference to Chayka.Spinners.spinner or false if no spinners needed
- * - spinnerId: id for generalSpinner
- * - spinnerFieldId: field id for showing spinner in the form field (uses formValidator)
- * - spinnerMessage: message to show with spinner
- * - errorMessage: default error message to show in case of error. Pass 'false' to suppress.
- * - successMessage: default success message to show in case of success. Pass 'false' to suppress.
- * - formValidator: reference to Chayka.Forms.formValidator
- * - validateOnSend: set to false if you don't want automatic validation
- * - scope: scope to call $apply in callbacks
- * - success: function(data, status, headers, config)
- * - error: function(data, status, headers, config)
- * - complete: function(data, status, headers, config)
- *
- * @returns {*}
+ * Ajax json response schema
+ */
+export interface AjaxResponseJsonInterface {
+
+    /**
+     * Response payload can be anything
+     */
+    payload: any,
+
+    /**
+     * Response code, 0 or '' means no error.
+     * Non-empty code means some error.
+     */
+    code: string|number,
+
+    /**
+     * Response message. Based on code value contains success or error message.
+     */
+    message: string,
+}
+
+/**
+ * Request options
  */
 export interface AjaxRequestArgs extends RequestOptionsArgs {
     /**
@@ -64,7 +70,19 @@ export interface AjaxRequestArgs extends RequestOptionsArgs {
      */
     validate?: boolean,
 
+    /**
+     * On complete handler
+     *
+     * @param {AjaxResponseJsonInterface} jsonResponse
+     */
+    onComplete?: (jsonResponse: AjaxResponseJsonInterface) => void,
+
+    /**
+     * Empty result set in case of error.
+     */
+    emptyResult?: any,
 }
+
 
 @Injectable()
 export class AjaxService {
@@ -141,7 +159,31 @@ export class AjaxService {
                 generalSpinner = this.spinners.show(options.spinnerMessage);
             }
 
-            let onComplete = () => {
+            let parseResponse = (res: Response): AjaxResponseJsonInterface => {
+                let json: any = null;
+                try{
+                    json = res.json();
+                }catch(e){
+                    let text = res.text();
+                    let rawJson = /{[^]*}/m.exec(text);
+                    try{
+                        json = rawJson && JSON.parse(rawJson[0]);
+                    }catch(e){
+                        json = null;
+                    }
+                }
+                return json ? {
+                    payload: json[this._responsePayloadField] || options.emptyResult,
+                    code: json[this._responseCodeField],
+                    message: json[this._responseMessageField]
+                }:{
+                    payload: options.emptyResult,
+                    code: 'server-error',
+                    message: res.text()
+                }
+            };
+
+            let onComplete = (jsonResponse: AjaxResponseJsonInterface) => {
                 /**
                  * Hide spinner
                  */
@@ -150,43 +192,37 @@ export class AjaxService {
                 }else if(options.spinner === undefined){
                     this.spinners.hide(generalSpinner);
                 }
+
+                /**
+                 * trigger on complete
+                 */
+                if(options.onComplete){
+                    options.onComplete(jsonResponse);
+                }
             };
 
-            let onError = (error: any) => {
-                if(options.errorMessage){
-                    this.modals.alert(<string> options.errorMessage);
-                }
-                // console.dir({error});
-                onComplete();
-                return error;
-            };
-
-            let parseResponse = (res: Response): T => {
-                let json: any = null;
-                try{
-                    json = res.json();
-                }catch(e){
-                    let text = res.text();
-                    // let rawJson = text.match(/{.*}/m);
-                    let rawJson = /{[^]*}/m.exec(text);
-                    // console.dir({text, rawJson});
-                    try{
-                        json = rawJson && JSON.parse(rawJson[0]);
-                    }catch(e){
-                        json = null;
-                    }
-                }
+            let onSuccess = (res: Response): T => {
+                let json = parseResponse(res);
+                onComplete(json);
                 if(options.successMessage){
-                    this.modals.alert(<string> options.successMessage);
+                    this.modals.alert(<string> (json.message||options.successMessage));
                 }
-                // console.dir({res, json});
-
-                return json && json[this._responsePayloadField] || null;
+                return <T> json.payload;
             };
+
+            let onError = (error: Response) => {
+                let json = parseResponse(error);
+                onComplete(json);
+                if(options.errorMessage){
+                    this.modals.alert(<string> (json.message||options.errorMessage));
+                }
+                return Observable.throw(json.message);
+            };
+
 
             let source = <Observable<T>> this.http.request(url, options)
-                .do(onComplete)
-                .map(parseResponse)
+                // .do(onComplete)
+                .map(onSuccess)
                 .catch(onError);
             return source;
         }
