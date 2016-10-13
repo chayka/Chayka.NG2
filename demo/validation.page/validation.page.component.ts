@@ -8,5 +8,11 @@ import { Component } from '@angular/core';
 })
 export class ValidationPageComponent {
     needValidation = true;
-    userPass='';
+    data = {
+
+    };
+
+    validateCustom(value: any){
+        return parseInt(value) === 1;
+    }
 }

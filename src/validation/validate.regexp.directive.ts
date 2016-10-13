@@ -26,7 +26,11 @@ export interface ValidateRegExpConfigInterface extends ValidateConfigInterface {
  * ```
  *  Or
  * ```
- * <form-field [validate-regexp]="{regexp: /\b(fuck|ass|dickhead)\b/i, message: 'Behave yourself!', forbid: true}">
+ * <form-field [validate-regexp]="{regexp: '/\b(fuck|ass|dickhead)\b/i', message: 'Behave yourself!', forbid: true}">
+ *      ...
+ * </form-field>
+ *  Or
+ * <form-field validate-regexp="/^\d*$/i">
  *      ...
  * </form-field>
  * ```
@@ -84,6 +88,16 @@ export class ValidateRegExpDirective extends ValidateAbstractDirective {
     }
 
     /**
+     * Since there are problems passing regexp in template, one can pass it as a string;
+     * @param str
+     * @return {RegExp}
+     */
+    parseRegExp(str: string): RegExp {
+        let m  = /^\/(.*)\/(\w*)$/.exec(str);
+        return m ? new RegExp(m[1], m[2]) : null;
+    }
+
+    /**
      * Validate input
      *
      * @return {boolean}
@@ -94,7 +108,9 @@ export class ValidateRegExpDirective extends ValidateAbstractDirective {
         let valid = true;
 
         if(config.regexp !== undefined){
-            let match = config.regexp.test(value);
+            let re = typeof config.regexp === 'string' ? this.parseRegExp(config.regexp) : config.regexp;
+            console.dir({re});
+            let match = re.test(value);
             valid = valid && (config.forbid ? !match : match)
         }
 

@@ -41,11 +41,6 @@ export interface AjaxRequestArgs extends RequestOptionsArgs {
     spinner?: SpinnerComponent|boolean,
 
     /**
-     * Form field with async validation that should show it's own internal spinner
-     */
-    spinnerField?: any,
-
-    /**
      * Message to show with spinner
      */
     spinnerMessage?: string,
@@ -155,10 +150,17 @@ export class AjaxService {
             let generalSpinner: string = null;
             if(options.spinner){
                 (<SpinnerComponent> options.spinner).show(options.spinnerMessage);
-            }else if(options.spinner === undefined){
+            } else if(options.spinner === undefined){
                 generalSpinner = this.spinners.show(options.spinnerMessage);
             }
 
+            /**
+             * Universal response parser, in any case responses with
+             * AjaxResponseJsonInterface {payload, message, code}
+             *
+             * @param {Response} res
+             * @return {AjaxResponseJsonInterface}
+             */
             let parseResponse = (res: Response): AjaxResponseJsonInterface => {
                 let json: any = null;
                 try{
@@ -183,6 +185,13 @@ export class AjaxService {
                 }
             };
 
+            /**
+             * Handler that is called no matter, error or success happened.
+             * If options.onComplete was set, calls that with AjaxResponseJsonInterface param.
+             * One can detect whether error occurred by non empty 'code' field.
+             *
+             * @param jsonResponse
+             */
             let onComplete = (jsonResponse: AjaxResponseJsonInterface) => {
                 /**
                  * Hide spinner
@@ -199,32 +208,48 @@ export class AjaxService {
                 if(options.onComplete){
                     options.onComplete(jsonResponse);
                 }
+                // console.dir({onComplete: jsonResponse});
             };
 
+            /**
+             * Success handler, hides spinner, shows message if necessary, calls options.onComplete.
+             *
+             * @param {Response} res
+             * @return {T}
+             */
             let onSuccess = (res: Response): T => {
                 let json = parseResponse(res);
                 onComplete(json);
                 if(options.successMessage){
-                    this.modals.alert(<string> (json.message||options.successMessage));
+                    let message: string = (typeof options.successMessage === 'string') ? <string> options.successMessage : json.message ;
+                    if(message){
+                        this.modals.alert(message);
+                    }
                 }
                 return <T> json.payload;
             };
 
+            /**
+             * Error handler, hides spinner, shows message if necessary, calls options.onComplete.
+             *
+             * @param error
+             * @return {ErrorObservable}
+             */
             let onError = (error: Response) => {
                 let json = parseResponse(error);
                 onComplete(json);
                 if(options.errorMessage){
-                    this.modals.alert(<string> (json.message||options.errorMessage));
+                    let message: string = (typeof options.errorMessage === 'string') ? <string> options.errorMessage : json.message ;
+                    if(message){
+                        this.modals.alert(message);
+                    }
                 }
                 return Observable.throw(json.message);
             };
 
-
-            let source = <Observable<T>> this.http.request(url, options)
-                // .do(onComplete)
+            return <Observable<T>> this.http.request(url, options)
                 .map(onSuccess)
                 .catch(onError);
-            return source;
         }
 
         return <Observable<T>> Observable.throw(this.nls._('Provided data is non valid'));

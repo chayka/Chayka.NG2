@@ -1,6 +1,7 @@
 import { ContentChild } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { NlsService } from '../nls/nls.service';
+import { FormFieldComponent } from './form-field.component';
 
 /**
  * Base directive configuration
@@ -85,6 +86,21 @@ export abstract class ValidateAbstractDirective {
      * NgModel which value is being assessed
      */
     @ContentChild(NgModel) ngModel: NgModel;
+
+    /**
+     * Form-Field component, that is being injected by form-field itself.
+     * @type {FormFieldComponent}
+     */
+    protected field: FormFieldComponent = null;
+
+    /**
+     * Set form field
+     *
+     * @param {FormFieldComponent} field
+     */
+    setFormField(field: FormFieldComponent){
+        this.field = field;
+    }
 
     /**
      * Get current input value, from [(ngModel)]

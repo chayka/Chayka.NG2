@@ -1,8 +1,9 @@
-import { Directive, Input, ContentChild } from '@angular/core';
+import { Directive, Input, ContentChild, ViewChild } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { ValidateConfigInterface, ValidateAbstractDirective } from './validate.abstract.directive';
 import { NlsService } from '../nls/nls.service';
-import { AjaxService } from '../ajax/ajax.service';
+import { AjaxService, AjaxResponseJsonInterface } from '../ajax/ajax.service';
+import { FormFieldComponent } from './form-field.component';
 
 /**
  * Custom validation config interface
@@ -128,6 +129,12 @@ export interface ValidateAsyncConfigInterface extends ValidateConfigInterface {
      * Defines if cache should be used
      */
     useCache?: boolean;
+
+    /**
+     * Debounce timeout that will be taken before sending data.
+     * Useful for on-the-fly data validation
+     */
+    delay?: number;
 }
 
 interface AsyncCacheItemInterface {
@@ -187,6 +194,7 @@ export class ValidateAsyncDirective extends ValidateAbstractDirective {
         validate: null,
         callback: null,
         useCache: true,
+        delay: 0,
     };
 
     cache: any = {};
@@ -211,37 +219,57 @@ export class ValidateAsyncDirective extends ValidateAbstractDirective {
         });
     }
 
+    protected getHash(value: any): string {
+        return ''+value;
+    }
+
+    protected timeout: any = null;
+
     /**
      * Validate input
      *
      * @return {boolean}
      */
-    validate(): boolean {
-        let config: ValidateAsyncConfigInterface = this.config;
-        let value = this.getValue();
-        let cacheId = ''+value;
-        let valid = null;
-        if(config.isActive){
-            if(config.useCache){
-                valid = this.cache[cacheId] && this.cache[cacheId].isValid;
-            }
-            if(valid === undefined){
-                this.cache[cacheId] = <AsyncCacheItemInterface>{isValid: null};
-                valid = null;
-                if(config.validate){
-                    let callback = (value: any, isValid: boolean, message?: string) => {
-                        this.cache[cacheId] = {isValid, message};
-                        if(config.callback){
-                            config.callback(value, isValid, message);
+    validate(config?: ValidateAsyncConfigInterface): boolean {
+
+            config = config || this.config;
+            let value = this.getValue();
+            let cacheId = this.getHash(value);
+            let valid: boolean = null;
+            if (config.isActive) {
+                if (config.useCache) {
+                    valid = this.cache[cacheId] && this.cache[cacheId].isValid;
+                }
+                if (valid === undefined) {
+                    if(this.timeout){
+                        clearTimeout(this.timeout);
+                    }
+                    this.timeout = setTimeout(() => {
+                        this.cache[cacheId] = <AsyncCacheItemInterface>{ isValid: null };
+                        if (config.validate) {
+                            let callback = (value: any, isValid: boolean, message?: string) => {
+                                this.cache[cacheId] = { isValid, message };
+                                console.dir({ cache: this.cache });
+                                /**
+                                 * Generally hides field spinner
+                                 */
+                                this.field.validate();
+                                if (config.callback) {
+                                    config.callback(value, isValid, message);
+                                }
+                            };
+                            /**
+                             * Show field spinner
+                             */
+                            this.field.setState('progress', this.nls._(config.asyncMessage));
+                            config.validate(value, callback);
                         }
-                    };
-                    config.validate(value, callback);
-                }else{
+                    }, config.delay);
                     return true;
                 }
+                return valid;
             }
-            return valid;
-        }
+        // }, 500);
         return true;
     }
 }
@@ -257,12 +285,6 @@ export interface ValidateApiConfigInterface extends ValidateAsyncConfigInterface
      * If function provided, it should return url, that will be used to check value.
      */
     url?: string|((value: any) => string);
-
-    /**
-     * Debounce timeout that will be taken before sending data.
-     * Useful for on-the-fly data validation
-     */
-    delay?: number;
 }
 
 /**
@@ -320,7 +342,7 @@ export class ValidateApiDirective extends ValidateAsyncDirective {
         callback: null,
         useCache: true,
         url: null,
-        dalay: 500,
+        delay: 500,
     };
 
     /**
@@ -353,40 +375,20 @@ export class ValidateApiDirective extends ValidateAsyncDirective {
      */
     validate(): boolean {
         let config = this.config;
-        let value = this.getValue();
-        this.userConfig.validate = (value: any, callback: (value: any, isValid: boolean, message?: string) => void): boolean => {
+        // let value = this.getValue();
+        config.validate = (value: any, callback: (value: any, isValid: boolean, message?: string) => void): boolean => {
             let url = typeof config.url === 'function'?
                 config.url(value):
-                this.nls._(config.url, {value: encodeURIComponent(value)});
+                config.url.replace('_VALUE_', encodeURIComponent(value));
             this.ajax.get(url, {
-
+                spinner: false,
+                onComplete: (json: AjaxResponseJsonInterface) => {
+                    callback(value, !json.code, json.message);
+                }
             }).subscribe();
             return null;
         };
 
-        return super.validate();
-        // let config: ValidateAsyncConfigInterface = this.config;
-        // let value = this.getValue();
-        // let cacheId = ''+value;
-        // let valid = null;
-        // if(config.isActive){
-        //     if(config.useCache){
-        //         valid = this.cache[cacheId] && this.cache[cacheId].isValid;
-        //     }
-        //     if(valid === undefined){
-        //         this.cache[cacheId] = <AsyncCacheItemInterface>{isValid: null};
-        //
-        //         let callback = (value: any, isValid: boolean, message?: string) => {
-        //             this.cache[cacheId] = {isValid, message};
-        //             if(config.callback){
-        //                 config.callback(value, isValid, message);
-        //             }
-        //         };
-        //
-        //         config.validate(value, callback);
-        //     }
-        //     return valid;
-        // }
-        // return true;
+        return super.validate(config);
     }
 }

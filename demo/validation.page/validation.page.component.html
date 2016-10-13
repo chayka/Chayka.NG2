@@ -1,12 +1,68 @@
 <h1>Form validation</h1>
 <div>
     <!--<form-validator>-->
-        <form-field [hint]="'Digits only...'" #field1
-                    validate-required="This is fucking required field"
-                    [validate-length]="{min: 6, max: 16}">
-            <label>Some input</label>
-            <input type="text" title="some input" [(ngModel)]="userPass"/>
-        </form-field>
+    <form-field hint="Digits only..." #field1
+                validate-required="This is fucking required field"
+                [validate-length]="{min: 6, max: 16}">
+        <label>Some input</label>
+        <input type="text" title="some input" [(ngModel)]="data.required"/>
+    </form-field>
+    <form-field hint="Range between 5 and 10"
+                [validate-range]="{ge: 5, lt: 11}">
+        <label>Range</label>
+        <input type="text" title="some input" [(ngModel)]="data.range"/>
+    </form-field>
+    <form-field hint="Lower or equal to 10"
+                [validate-range]="{le: 10}">
+        <label>LE</label>
+        <input type="text" title="some input" [(ngModel)]="data.le"/>
+    </form-field>
+    <form-field hint="Lower than 10"
+                [validate-range]="{lt: 10}">
+        <label>LT</label>
+        <input type="text" title="some input" [(ngModel)]="data.lt"/>
+    </form-field>
+    <form-field hint="Greater than 10"
+                [validate-range]="{gt: 10}">
+        <label>GT</label>
+        <input type="text" title="some input" [(ngModel)]="data.gt"/>
+    </form-field>
+    <form-field hint="Greater or equal to 10"
+                validate-range="10">
+        <label>GE</label>
+        <input type="text" title="some input" [(ngModel)]="data.ge"/>
+    </form-field>
+    <form-field hint="Digits only"
+                validate-regexp="/^\d*$/">
+        <label>RegExp</label>
+        <input type="text" title="some input" [(ngModel)]="data.regexp"/>
+    </form-field>
+    <form-field hint="Email, please"
+                validate-email>
+        <label>Email</label>
+        <input type="text" title="some input" [(ngModel)]="data.email"/>
+    </form-field>
+    <form-field hint="Custom, enter '1'"
+                [validate-custom]="validateCustom">
+        <label>Custom</label>
+        <input type="text" title="some input" [(ngModel)]="data.custom"/>
+    </form-field>
+    <form-field hint="API success"
+                validate-api="/api/empty.json?value=_VALUE_">
+        <label>API success</label>
+        <input type="text" title="some input" [(ngModel)]="data.apiSuccess"/>
+    </form-field>
+    <form-field hint="API fail"
+                [validate-api]="{url: '/api/error.json?value=_VALUE_', delay: 1000}">
+        <label>API error</label>
+        <input type="text" title="some input" [(ngModel)]="data.apiFail"/>
+    </form-field>
+    <form-field-radio validate-custom="validateCustom">
+        <label class="field-label">Options</label>
+        <label><input type="radio" name="radion" value="1" title="some input" [(ngModel)]="data.radio"/>text 1</label>
+        <label><input type="radio" name="radion" value="2" title="some input" [(ngModel)]="data.radio"/>text 2</label>
+        <label><input type="radio" name="radion" value="3" title="some input" [(ngModel)]="data.radio"/>text 3</label>
+    </form-field-radio>
     <!--</form-validator>-->
     <button (click)="needValidation = !needValidation;">Toggle validation</button>
     Validation {{needValidation?'On':'Off'}}

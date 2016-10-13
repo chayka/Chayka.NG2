@@ -1,0 +1,15 @@
+<div class="form-field"
+     [class.clean]="state === 'clean'"
+     [class.valid]="state === 'valid'"
+     [class.invalid]="state === 'invalid'"
+     [class.progress]="state === 'progress'">
+    <ng-content select=".field-label"></ng-content>
+    <div class="form-field-input-box">
+        <div class="form-field-input">
+            <ng-content select=""></ng-content>
+        </div>
+        <div class="form-field-message">
+            {{ state === 'invalid' || state === 'progress' ? message : hint }}
+        </div>
+    </div>
+</div>

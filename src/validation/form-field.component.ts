@@ -3,8 +3,8 @@ import {
     Renderer, ElementRef
 } from '@angular/core';
 import { NgModel } from '@angular/forms';
-import { ValidateRequiredDirective } from './validate.required.directive';
 import { ValidateAbstractDirective } from './validate.abstract.directive';
+import { ValidateRequiredDirective } from './validate.required.directive';
 import { ValidateLengthDirective } from './validate.length.directive';
 import {
     ValidateRangeDirective,
@@ -21,6 +21,11 @@ import {
     ValidatePasswordComplexityDirective,
     ValidatePasswordRepeatDirective
 } from './validate.password.dirctive';
+import {
+    ValidateCustomDirective,
+    ValidateAsyncDirective,
+    ValidateApiDirective
+} from './validate.custom.directive';
 
 /**
  * Provides form validation in the following format
@@ -66,6 +71,12 @@ export class FormFieldComponent implements OnInit {
      * @type {string}
      */
     @Input() hint: string = '';
+
+    /**
+     * Hint that is shown below input while not in 'invalid' or 'progress' state
+     * @type {string}
+     */
+    @Input() label: string = '';
 
     /**
      * NgModel which value is being assessed
@@ -143,6 +154,21 @@ export class FormFieldComponent implements OnInit {
     @ContentChild(ValidatePasswordRepeatDirective) vPasswordRepeat : ValidatePasswordRepeatDirective;
 
     /**
+     * Fetch validate-custom
+     */
+    @ContentChild(ValidateCustomDirective) vCustom : ValidateCustomDirective;
+
+    /**
+     * Fetch validate-async
+     */
+    @ContentChild(ValidateAsyncDirective) vAsync : ValidateAsyncDirective;
+
+    /**
+     * Fetch validate-api
+     */
+    @ContentChild(ValidateApiDirective) vApi : ValidateApiDirective;
+
+    /**
      * Constructor
      *
      * @param el
@@ -163,36 +189,23 @@ export class FormFieldComponent implements OnInit {
                 setTimeout(() => this.validate(), 0);
             })
         }
-        if(this.vLength){
-            this.validations.push(this.vLength);
+
+        [
+            this.vLength,
+            this.vRange, this.vGe, this.vGt, this.vLe, this.vLt,
+            this.vRegExp, this.vEmail,
+            this.vPasswordComplexity, this.vPasswordRepeat,
+            this.vCustom, this.vAsync, this.vApi,
+        ].forEach((validation: ValidateAbstractDirective )=> {
+            if(validation){
+                validation.setFormField(this);
+                this.validations.push(validation);
+            }
+        });
+        if(this.vRequired){
+            this.vRequired.setFormField(this);
         }
-        if(this.vRange){
-            this.validations.push(this.vRange);
-        }
-        if(this.vGe){
-            this.validations.push(this.vGe);
-        }
-        if(this.vGt){
-            this.validations.push(this.vGt);
-        }
-        if(this.vLe){
-            this.validations.push(this.vLe);
-        }
-        if(this.vLt){
-            this.validations.push(this.vLt);
-        }
-        if(this.vRegExp){
-            this.validations.push(this.vRegExp);
-        }
-        if(this.vEmail){
-            this.validations.push(this.vEmail);
-        }
-        if(this.vPasswordComplexity){
-            this.validations.push(this.vPasswordComplexity);
-        }
-        if(this.vPasswordRepeat){
-            this.validations.push(this.vPasswordRepeat);
-        }
+
     }
 
     /**
@@ -250,3 +263,4 @@ export class FormFieldComponent implements OnInit {
         return valid;
     }
 }
+

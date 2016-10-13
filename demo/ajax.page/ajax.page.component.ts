@@ -80,7 +80,7 @@ export class AjaxPageComponent {
 
     requestPlainPostItems(){
         this.ajax.post<string[]>('/api/ppap.json', this.ajax.buildQuery({test: 'test'}), {
-            errorMessage: 'You are stubborn, aren\'t you?'
+            errorMessage: true
         }).subscribe(
             ppap => {
                 ppap.forEach(item => this.items.push('I have ' + item));

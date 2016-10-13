@@ -79,8 +79,8 @@ export class ValidateRangeDirective extends ValidateAbstractDirective {
         super(nls);
         this.nls.extendDictionary('en-US', {
             'validate-range-message-min-max': 'The value should be between {{min}} and {{max}}',
-            'validate-range-message-min': 'The value should be at least {{min}} chars',
-            'validate-range-message-max': 'The value should be {{max}} chars max',
+            'validate-range-message-min': 'The value should be at least {{min}}',
+            'validate-range-message-max': 'The value should be {{max}} max',
         });
         this.nls.extendDictionary('ru-RU', {
             'validate-range-message-min-max': 'Значение должно быть в рамках от {{min}} до {{max}}',
