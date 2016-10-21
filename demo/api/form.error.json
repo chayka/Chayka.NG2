@@ -1,0 +1,7 @@
+{
+    "payload": {
+        "email": "Already exists!"
+    },
+    "code": "validation-errors",
+    "message": "Scary Error"
+}

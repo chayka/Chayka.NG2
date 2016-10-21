@@ -79,6 +79,12 @@ export class FormFieldComponent implements OnInit {
     @Input() label: string = '';
 
     /**
+     * Input name, required to show errors on bulk API validation.
+     * @type {string}
+     */
+    @Input() name: string = '';
+
+    /**
      * NgModel which value is being assessed
      */
     @ContentChild(NgModel) ngModel: NgModel;
@@ -222,24 +228,27 @@ export class FormFieldComponent implements OnInit {
     /**
      * Perform single validation and set appropriate field state
      *
-     * @param validation
+     * @param {ValidateAbstractDirective} validation
+     * @param {boolean} silent
      * @return {boolean|null}
      */
-    performValidation(validation: ValidateAbstractDirective): boolean | null{
+    performValidation(validation: ValidateAbstractDirective, silent: boolean = false): boolean | null{
         let valid = validation.validate();
-        switch(valid){
-            case true:
-                this.state = 'valid';
-                this.message = '';
-                break;
-            case false:
-                this.state = 'invalid';
-                this.message = validation.getMessage('message');
-                break;
-            case null:
-                this.state = 'progress';
-                this.message = validation.getMessage('asyncMessage');
-                break;
+        if(!silent){
+            switch(valid){
+                case true:
+                    this.state = 'valid';
+                    this.message = '';
+                    break;
+                case false:
+                    this.state = 'invalid';
+                    this.message = validation.getMessage('message');
+                    break;
+                case null:
+                    this.state = 'progress';
+                    this.message = validation.getMessage('asyncMessage');
+                    break;
+            }
         }
         return valid;
     }
@@ -247,16 +256,18 @@ export class FormFieldComponent implements OnInit {
     /**
      * Perform all validations
      *
+     * @param {boolean} silent
+     *
      * @return {boolean|boolean|null}
      */
-    validate(): boolean | null {
+    validate(silent: boolean = false): boolean | null {
         let v = this.validations;
-        let valid = !this.vRequired || this.performValidation(this.vRequired);
+        let valid = !this.vRequired || this.performValidation(this.vRequired, silent);
         let value = this.value;
         if(value && valid){
             Object.keys(v).forEach(key => {
                 // if(valid){
-                    valid = valid && this.performValidation(v[key]);
+                    valid = valid && this.performValidation(v[key], silent);
                 // }
             });
         }

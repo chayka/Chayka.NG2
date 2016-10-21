@@ -6,6 +6,7 @@ import { ModalsService } from '../modals/modals.service';
 import { SpinnersService } from '../spinners/spinners.service';
 import { NgForm } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { FormValidatorDirective } from '../validation/form-validator.directive';
 
 /**
  * Ajax json response schema
@@ -58,7 +59,7 @@ export interface AjaxRequestArgs extends RequestOptionsArgs {
     /**
      * Form validator
      */
-    validator?: NgForm,
+    validator?: NgForm | FormValidatorDirective,
 
     /**
      * Marks if form validator should check data before request
@@ -193,6 +194,7 @@ export class AjaxService {
              * @param jsonResponse
              */
             let onComplete = (jsonResponse: AjaxResponseJsonInterface) => {
+
                 /**
                  * Hide spinner
                  */
@@ -200,6 +202,15 @@ export class AjaxService {
                     (<SpinnerComponent> options.spinner).hide();
                 }else if(options.spinner === undefined){
                     this.spinners.hide(generalSpinner);
+                }
+
+                /**
+                 * Show errors.
+                 * TODO: move to onError
+                 */
+                if(jsonResponse.code === 'validation-errors' &&
+                    options.validator && options.validator['showErrors']){
+                    options.validator['showErrors'](jsonResponse.payload);
                 }
 
                 /**

@@ -1,6 +1,6 @@
 <h1>Form validation</h1>
 <div>
-    <!--<form-validator>-->
+    <form-validator #validator="formValidator">
     <form-field hint="Digits only..." #field1
                 validate-required="This is fucking required field"
                 [validate-length]="{min: 6, max: 16}">
@@ -37,7 +37,7 @@
         <label>RegExp</label>
         <input type="text" title="some input" [(ngModel)]="data.regexp"/>
     </form-field>
-    <form-field hint="Email, please"
+    <form-field name="email" hint="Email, please"
                 validate-email>
         <label>Email</label>
         <input type="text" title="some input" [(ngModel)]="data.email"/>
@@ -57,14 +57,15 @@
         <label>API error</label>
         <input type="text" title="some input" [(ngModel)]="data.apiFail"/>
     </form-field>
-    <form-field-radio validate-custom="validateCustom">
+    <form-field [validate-custom]="validateCustom">
         <label class="field-label">Options</label>
         <label><input type="radio" name="radion" value="1" title="some input" [(ngModel)]="data.radio"/>text 1</label>
         <label><input type="radio" name="radion" value="2" title="some input" [(ngModel)]="data.radio"/>text 2</label>
         <label><input type="radio" name="radion" value="3" title="some input" [(ngModel)]="data.radio"/>text 3</label>
-    </form-field-radio>
-    <!--</form-validator>-->
+    </form-field>
+    </form-validator>
     <button (click)="needValidation = !needValidation;">Toggle validation</button>
     Validation {{needValidation?'On':'Off'}}
-    <button (click)="field1.validate();">Validate</button>
+    <button (click)="validator.validate();">Validate</button>
+    <button (click)="sendData(validator);">Submit</button>
 </div>

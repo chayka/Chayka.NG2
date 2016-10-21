@@ -13,6 +13,8 @@ import {
 import { ValidateRegExpDirective, ValidateEmailDirective } from './validate.regexp.directive';
 import { ValidatePasswordComplexityDirective, ValidatePasswordRepeatDirective } from './validate.password.dirctive';
 import { ValidateCustomDirective, ValidateAsyncDirective, ValidateApiDirective } from './validate.custom.directive';
+import { FormValidatorDirective } from './form-validator.directive';
+
 /**
  * Provides form validation in the following format
  *
@@ -28,6 +30,7 @@ import { ValidateCustomDirective, ValidateAsyncDirective, ValidateApiDirective }
 @NgModule({
     imports: [ CommonModule, FormsModule ],
     declarations: [
+        FormValidatorDirective,
         FormFieldComponent,
         FormFieldRadioComponent,
         ValidateRequiredDirective,
@@ -46,6 +49,7 @@ import { ValidateCustomDirective, ValidateAsyncDirective, ValidateApiDirective }
         ValidateApiDirective,
     ],
     exports: [
+        FormValidatorDirective,
         FormFieldComponent,
         FormFieldRadioComponent,
         ValidateRequiredDirective,
